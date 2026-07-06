@@ -1,0 +1,790 @@
+
+
+/*TABLA CATEGORIAS*/
+
+CREATE TABLE categorias(
+
+id_categoria SERIAL PRIMARY KEY,
+
+nombre_categoria VARCHAR(100) UNIQUE NOT NULL
+
+);
+
+
+
+/*TABLA SABORES*/
+
+CREATE TABLE sabores(
+
+id_sabor SERIAL PRIMARY KEY,
+
+nombre_sabor VARCHAR(100) UNIQUE NOT NULL,
+
+id_categoria INT NOT NULL,
+
+FOREIGN KEY(id_categoria)
+REFERENCES categorias(id_categoria)
+
+);
+
+
+
+/*TABLA UNIDADES DE MEDIDA*/
+
+CREATE TABLE unidades_medidas(
+
+id_unidad_medida SERIAL PRIMARY KEY,
+
+unidad_medida VARCHAR(50) UNIQUE NOT NULL,
+
+abreviatura VARCHAR(10) UNIQUE NOT NULL
+
+);
+
+
+
+/*TABLA PRODUCTOS*/
+
+CREATE TABLE productos(
+
+id_producto SERIAL PRIMARY KEY,
+
+nombre_producto VARCHAR(120) UNIQUE NOT NULL,
+
+descripcion VARCHAR(250),
+
+precio NUMERIC(10,2) NOT NULL CHECK(precio>0),
+
+stock INT NOT NULL CHECK(stock>=0),
+
+id_sabor INT NOT NULL,
+
+id_unidad_medida INT NOT NULL,
+
+FOREIGN KEY(id_sabor)
+REFERENCES sabores(id_sabor),
+
+FOREIGN KEY(id_unidad_medida)
+REFERENCES unidades_medidas(id_unidad_medida)
+
+);
+
+
+
+/*TABLA CIUDADES*/
+
+CREATE TABLE ciudades(
+
+id_ciudad SERIAL PRIMARY KEY,
+
+nombre_ciudad VARCHAR(100) NOT NULL,
+
+departamento VARCHAR(100),
+
+pais VARCHAR(100) DEFAULT 'Colombia'
+
+);
+
+
+
+/*TABLA PROVEEDORES*/
+
+CREATE TABLE proveedores(
+
+id_proveedor SERIAL PRIMARY KEY,
+
+nombre_proveedor VARCHAR(120) NOT NULL,
+
+nit VARCHAR(20) UNIQUE NOT NULL,
+
+telefono VARCHAR(20),
+
+email VARCHAR(120) UNIQUE,
+
+id_ciudad INT NOT NULL,
+
+FOREIGN KEY(id_ciudad)
+REFERENCES ciudades(id_ciudad)
+
+);
+
+
+
+/*TABLA CLIENTES*/
+
+CREATE TABLE clientes(
+
+id_cliente SERIAL PRIMARY KEY,
+
+nombre_cliente VARCHAR(120) NOT NULL,
+
+telefono VARCHAR(20),
+
+correo VARCHAR(120) UNIQUE
+
+);
+
+
+
+/*TABLA COMPRAS*/
+
+CREATE TABLE compras(
+
+id_compra SERIAL PRIMARY KEY,
+
+fecha_compra DATE NOT NULL,
+
+id_proveedor INT NOT NULL,
+
+FOREIGN KEY(id_proveedor)
+REFERENCES proveedores(id_proveedor)
+
+);
+
+
+
+/*TABLA DETALLE COMPRAS*/
+
+CREATE TABLE detalle_compras(
+
+id_detalle_compra SERIAL PRIMARY KEY,
+
+id_compra INT NOT NULL,
+
+id_producto INT NOT NULL,
+
+cantidad INT NOT NULL CHECK(cantidad>0),
+
+precio_compra NUMERIC(10,2) NOT NULL,
+
+subtotal NUMERIC(10,2) NOT NULL,
+
+FOREIGN KEY(id_compra)
+REFERENCES compras(id_compra),
+
+FOREIGN KEY(id_producto)
+REFERENCES productos(id_producto)
+
+);
+
+
+
+/*TABLA VENTAS*/
+
+CREATE TABLE ventas(
+
+id_venta SERIAL PRIMARY KEY,
+
+fecha_venta DATE NOT NULL,
+
+id_cliente INT NOT NULL,
+
+FOREIGN KEY(id_cliente)
+REFERENCES clientes(id_cliente)
+
+);
+
+
+
+/*TABLA DETALLE VENTAS*/
+
+CREATE TABLE detalle_ventas(
+
+id_detalle_venta SERIAL PRIMARY KEY,
+
+id_venta INT NOT NULL,
+
+id_producto INT NOT NULL,
+
+cantidad INT NOT NULL CHECK(cantidad>0),
+
+precio_venta NUMERIC(10,2) NOT NULL,
+
+subtotal NUMERIC(10,2) NOT NULL,
+
+FOREIGN KEY(id_venta)
+REFERENCES ventas(id_venta),
+
+FOREIGN KEY(id_producto)
+REFERENCES productos(id_producto)
+
+);
+
+
+
+/*TABLA MOVIMIENTOS INVENTARIO*/
+
+CREATE TABLE movimientos_inventario(
+
+id_movimiento SERIAL PRIMARY KEY,
+
+fecha_movimiento DATE NOT NULL,
+
+tipo_movimiento VARCHAR(20)
+CHECK(tipo_movimiento IN ('Entrada','Salida')),
+
+cantidad INT NOT NULL CHECK(cantidad>0),
+
+id_producto INT NOT NULL,
+
+FOREIGN KEY(id_producto)
+REFERENCES productos(id_producto)
+
+);
+/* INSERT INTO CATEGORIAS*/
+
+INSERT INTO categorias (nombre_categoria)
+VALUES
+('Helados'),
+('Bebidas'),
+('Postres'),
+('Toppings');
+
+
+/*INSERT INTO SABORES*/
+
+INSERT INTO sabores (nombre_sabor,id_categoria)
+VALUES
+('Chocolate',1),
+('Vainilla',1),
+('Fresa',1),
+('Mango',1),
+('Limón',1),
+('Café',1),
+('Galleta',1),
+('Caramelo',1);
+
+
+/*INSERT INTO UNIDADES DE MEDIDA*/
+
+INSERT INTO unidades_medidas(unidad_medida,abreviatura)
+VALUES
+('Unidad','Und'),
+('Mililitro','ml'),
+('Gramo','g'),
+('Kilogramo','kg'),
+('Litro','L');
+
+
+/*INSERT INTO PRODUCTOS*/
+
+INSERT INTO productos
+(nombre_producto,descripcion,precio,stock,id_sabor,id_unidad_medida)
+VALUES
+('Cono Chocolate','Helado en cono sabor chocolate',7000,80,1,1),
+('Cono Vainilla','Helado en cono sabor vainilla',7000,90,2,1),
+('Cono Fresa','Helado en cono sabor fresa',7000,70,3,1),
+('Malteada Chocolate','Malteada grande',12000,40,1,2),
+('Malteada Vainilla','Malteada grande',12000,35,2,2),
+('Sundae Fresa','Helado con salsa',9500,50,3,1),
+('Copa Mango','Helado tropical',9000,60,4,1),
+('Brownie con Helado','Postre especial',15000,25,1,1),
+('Milkshake Café','Bebida fría',13000,30,6,2),
+('Helado Galleta','Helado premium',10000,45,7,1);
+
+
+/*INSERT INTO CIUDADES*/
+
+INSERT INTO ciudades(nombre_ciudad,departamento)
+VALUES
+('Barranquilla','Atlántico'),
+('Bogotá','Cundinamarca'),
+('Medellín','Antioquia'),
+('Cali','Valle del Cauca'),
+('Cartagena','Bolívar');
+
+
+/*INSERT INTO PROVEEDORES*/
+
+INSERT INTO proveedores
+(nombre_proveedor,nit,telefono,email,id_ciudad)
+VALUES
+('Lácteos del Caribe','900111111','3001111111','contacto@lacteos.com',1),
+('Frutas Tropicales SAS','900222222','3002222222','ventas@frutas.com',2),
+('Distribuidora Dulce','900333333','3003333333','info@dulce.com',3),
+('Insumos Helados','900444444','3004444444','ventas@insumos.com',4),
+('Empaques Colombia','900555555','3005555555','contacto@empaques.com',5);
+
+
+/*INSERT INTO CLIENTES*/
+
+INSERT INTO clientes
+(nombre_cliente,telefono,correo)
+VALUES
+('Juan Pérez','3011111111','juan@gmail.com'),
+('María Gómez','3022222222','maria@gmail.com'),
+('Carlos Ruiz','3033333333','carlos@gmail.com'),
+('Ana Torres','3044444444','ana@gmail.com'),
+('Luisa Martínez','3055555555','luisa@gmail.com'),
+('Pedro Díaz','3066666666','pedro@gmail.com');
+
+
+/*INSERT INTO COMPRAS*/
+
+INSERT INTO compras
+(fecha_compra,id_proveedor)
+VALUES
+('2025-01-05',1),
+('2025-01-15',2),
+('2025-02-01',3),
+('2025-02-20',4),
+('2025-03-10',5);
+
+
+/*INSERT INTO DETALLE COMPRAS*/
+
+INSERT INTO detalle_compras
+(id_compra,id_producto,cantidad,precio_compra,subtotal)
+VALUES
+(1,1,100,5000,500000),
+(1,2,80,5000,400000),
+(2,3,70,5200,364000),
+(2,4,30,8500,255000),
+(3,5,40,9000,360000),
+(3,6,50,7000,350000),
+(4,7,60,6800,408000),
+(4,8,25,12000,300000),
+(5,9,35,9500,332500),
+(5,10,45,7500,337500);
+
+
+/*INSERT INTO VENTAS*/
+
+INSERT INTO ventas
+(fecha_venta,id_cliente)
+VALUES
+('2025-04-01',1),
+('2025-04-01',2),
+('2025-04-02',3),
+('2025-04-03',4),
+('2025-04-03',5),
+('2025-04-04',6);
+
+
+/*INSERT INTO DETALLE VENTAS*/
+
+INSERT INTO detalle_ventas
+(id_venta,id_producto,cantidad,precio_venta,subtotal)
+VALUES
+(1,1,2,7000,14000),
+(1,4,1,12000,12000),
+(2,2,3,7000,21000),
+(3,6,2,9500,19000),
+(4,8,1,15000,15000),
+(5,9,2,13000,26000),
+(6,10,4,10000,40000);
+
+
+/* INSERT INTO MOVIMIENTOS INVENTARIO*/
+
+INSERT INTO movimientos_inventario
+(fecha_movimiento,tipo_movimiento,cantidad,id_producto)
+VALUES
+('2025-01-05','Entrada',100,1),
+('2025-01-05','Entrada',80,2),
+('2025-01-15','Entrada',70,3),
+('2025-02-01','Entrada',30,4),
+('2025-02-20','Entrada',40,5),
+('2025-03-10','Entrada',50,6),
+('2025-04-01','Salida',2,1),
+('2025-04-01','Salida',1,4),
+('2025-04-02','Salida',3,2),
+('2025-04-03','Salida',2,6),
+('2025-04-03','Salida',1,8),
+('2025-04-04','Salida',4,10);
+
+
+/*CONSULTA 1.Inventario disponible por producto*/
+
+SELECT
+    p.nombre_producto,
+    p.stock AS inventario_disponible
+FROM productos p
+ORDER BY inventario_disponible DESC;
+
+
+/*CONSULTA 2.Productos más vendidos*/
+
+SELECT
+    p.nombre_producto,
+    SUM(dv.cantidad) AS total_vendido
+FROM detalle_ventas dv
+INNER JOIN productos p
+ON dv.id_producto = p.id_producto
+GROUP BY p.nombre_producto
+ORDER BY total_vendido DESC;
+
+
+/*CONSULTA 3.Ventas realizadas por cliente*/
+
+SELECT
+    c.nombre_cliente,
+    COUNT(v.id_venta) AS total_compras
+FROM clientes c
+INNER JOIN ventas v
+ON c.id_cliente = v.id_cliente
+GROUP BY c.nombre_cliente
+ORDER BY total_compras DESC;
+
+
+/*CONSULTA 4.Total vendido por cliente*/
+
+SELECT
+    c.nombre_cliente,
+    SUM(dv.subtotal) AS total_gastado
+FROM clientes c
+INNER JOIN ventas v
+ON c.id_cliente = v.id_cliente
+INNER JOIN detalle_ventas dv
+ON v.id_venta = dv.id_venta
+GROUP BY c.nombre_cliente
+ORDER BY total_gastado DESC;
+
+
+/*CONSULTA 5.Proveedor con mayor cantidad de compras*/
+
+SELECT
+    p.nombre_proveedor,
+    COUNT(c.id_compra) AS compras_realizadas
+FROM proveedores p
+INNER JOIN compras c
+ON p.id_proveedor = c.id_proveedor
+GROUP BY p.nombre_proveedor
+ORDER BY compras_realizadas DESC;
+
+
+/*CONSULTA 6.Dinero invertido por proveedor*/
+
+SELECT
+    p.nombre_proveedor,
+    SUM(dc.subtotal) AS total_invertido
+FROM proveedores p
+INNER JOIN compras c
+ON p.id_proveedor = c.id_proveedor
+INNER JOIN detalle_compras dc
+ON c.id_compra = dc.id_compra
+GROUP BY p.nombre_proveedor
+ORDER BY total_invertido DESC;
+
+
+/*CONSULTA 7.Productos por sabor*/
+
+SELECT
+    s.nombre_sabor,
+    p.nombre_producto
+FROM sabores s
+INNER JOIN productos p
+ON s.id_sabor = p.id_sabor
+ORDER BY s.nombre_sabor;
+
+
+/*CONSULTA 8.Precio promedio de los productos*/
+
+SELECT
+AVG(precio) AS precio_promedio
+FROM productos;
+
+
+/*CONSULTA 9.Producto más costoso*/
+
+SELECT
+nombre_producto,
+precio
+FROM productos
+ORDER BY precio DESC
+LIMIT 1;
+
+
+/*CONSULTA 10.Producto más económico*/
+
+SELECT
+nombre_producto,
+precio
+FROM productos
+ORDER BY precio ASC
+LIMIT 1;
+
+
+/*CONSULTA 11.Productos con menor stock*/
+
+SELECT
+nombre_producto,
+stock
+FROM productos
+ORDER BY stock ASC
+LIMIT 5;
+
+
+/*CONSULTA 12.Cantidad de productos por categoría*/
+
+SELECT
+    c.nombre_categoria,
+    COUNT(*) AS cantidad
+FROM categorias c
+INNER JOIN sabores s
+ON c.id_categoria = s.id_categoria
+INNER JOIN productos p
+ON s.id_sabor = p.id_sabor
+GROUP BY c.nombre_categoria
+ORDER BY cantidad DESC;
+
+
+/*CONSULTA 13.Ventas realizadas por fecha*/
+
+SELECT
+fecha_venta,
+COUNT(*) AS ventas
+FROM ventas
+GROUP BY fecha_venta
+ORDER BY fecha_venta;
+
+
+/*CONSULTA 14.Valor total vendido*/
+
+SELECT
+SUM(subtotal) AS ventas_totales
+FROM detalle_ventas;
+
+
+/*CONSULTA 15.Detalle completo de ventas*/
+
+SELECT
+
+v.id_venta,
+v.fecha_venta,
+c.nombre_cliente,
+p.nombre_producto,
+dv.cantidad,
+dv.precio_venta,
+dv.subtotal
+
+FROM detalle_ventas dv
+INNER JOIN ventas v
+ON dv.id_venta = v.id_venta
+INNER JOIN clientes c
+ON v.id_cliente = c.id_cliente
+INNER JOIN productos p
+ON dv.id_producto = p.id_producto
+ORDER BY v.id_venta;
+
+/*UPDATE.Actualizar el precio de un producto*/
+
+UPDATE productos
+SET precio = 8000
+WHERE id_producto = 1;
+
+SELECT * FROM productos
+WHERE id_producto = 1;
+
+
+
+/*UPDATE.Actualizar el stock de un producto*/
+
+UPDATE productos
+SET stock = stock + 20
+WHERE id_producto = 2;
+
+SELECT * FROM productos
+WHERE id_producto = 2;
+
+
+
+/*DELETE.Eliminar un cliente*/
+
+DELETE FROM clientes
+WHERE id_cliente = 6;
+
+SELECT * FROM clientes;
+
+
+
+/*ALTER TABLE.Agregar columna marca*/
+
+ALTER TABLE productos
+ADD COLUMN marca VARCHAR(50);
+
+
+
+/*Actualizar la nueva columna*/
+
+UPDATE productos
+SET marca='Popsy'
+WHERE id_producto=1;
+
+UPDATE productos
+SET marca='Mimo''s'
+WHERE id_producto=2;
+
+UPDATE productos
+SET marca='Crem Helado'
+WHERE id_producto=3;
+
+
+
+/*CREATE VIEW.Vista general de productos*/
+
+CREATE VIEW vista_productos AS
+
+SELECT
+
+p.id_producto,
+
+p.nombre_producto,
+
+s.nombre_sabor,
+
+c.nombre_categoria,
+
+p.precio,
+
+p.stock
+
+FROM productos p
+
+INNER JOIN sabores s
+
+ON p.id_sabor=s.id_sabor
+
+INNER JOIN categorias c
+
+ON s.id_categoria=c.id_categoria;
+
+
+
+SELECT * FROM vista_productos;
+
+
+
+/*CREATE VIEW.Vista de ventas*/
+
+CREATE VIEW vista_ventas AS
+
+SELECT
+
+v.id_venta,
+
+v.fecha_venta,
+
+cl.nombre_cliente,
+
+p.nombre_producto,
+
+dv.cantidad,
+
+dv.subtotal
+
+FROM detalle_ventas dv
+
+INNER JOIN ventas v
+
+ON dv.id_venta=v.id_venta
+
+INNER JOIN clientes cl
+
+ON v.id_cliente=cl.id_cliente
+
+INNER JOIN productos p
+
+ON dv.id_producto=p.id_producto;
+
+
+
+SELECT * FROM vista_ventas;
+
+
+
+/*CREATE INDEX*/
+
+CREATE INDEX idx_producto
+
+ON productos(nombre_producto);
+
+
+
+CREATE INDEX idx_cliente
+
+ON clientes(nombre_cliente);
+
+
+
+CREATE INDEX idx_sabor
+
+ON sabores(nombre_sabor);
+
+
+
+/*TRANSACCION COMMIT*/
+
+BEGIN;
+
+UPDATE productos
+
+SET precio=8500
+
+WHERE id_producto=1;
+
+COMMIT;
+
+
+
+/*TRANSACCION ROLLBACK*/
+
+BEGIN;
+
+UPDATE productos
+
+SET precio=100000
+
+WHERE id_producto=2;
+
+ROLLBACK;
+
+
+
+/*TRANSACCION INSERT*/
+
+BEGIN;
+
+INSERT INTO clientes
+
+(nombre_cliente,telefono,correo)
+
+VALUES
+
+('Laura Castro','3009998888','laura@gmail.com');
+
+COMMIT;
+
+
+
+/*TRANSACCION DELETE*/
+
+BEGIN;
+
+DELETE FROM clientes
+
+WHERE nombre_cliente='Laura Castro';
+
+ROLLBACK;
+
+
+
+/*FUNCIONES DE AGREGACION*/
+
+SELECT COUNT(*) AS total_clientes
+FROM clientes;
+
+SELECT COUNT(*) AS total_productos
+FROM productos;
+
+SELECT SUM(precio) AS suma_precios
+FROM productos;
+
+SELECT AVG(precio) AS promedio_precios
+FROM productos;
+
+SELECT MAX(precio) AS precio_mayor
+FROM productos;
+
+SELECT MIN(precio) AS precio_menor
+FROM productos;
